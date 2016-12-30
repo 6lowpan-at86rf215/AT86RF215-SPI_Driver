@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
 	uint8_t rx[2];
 	atexit(clean);
 	spi_init();
-	transfer(tx,2,rx,2);
+	spi_transfer(tx,2,rx,2);
 	printf("send address: %.2X %.2X \n",tx[0],tx[1]);
 	printf("recv mesage:\n");
 	for(i=0;i<2;i++)

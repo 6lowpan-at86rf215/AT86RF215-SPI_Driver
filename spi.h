@@ -9,5 +9,5 @@ struct spi_t{
 	int fd;
 };
 void spi_init(void);
-void transfer(uint8_t*tx,uint32_t tx_len,uint8_t*rx,uint32_t rx_len);
+void spi_transfer(uint8_t*tx,uint32_t tx_len,uint8_t*rx,uint32_t rx_len);
 #endif

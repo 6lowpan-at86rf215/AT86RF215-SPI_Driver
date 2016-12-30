@@ -1,3 +1,10 @@
+/*
+ * AT86RF215 test code with spi driver
+ *
+ * Copyright (c) 2016  Cisco, Inc.
+ * Copyright (c) 2016  <binyao@cisco.com>
+ *
+ */
 #include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -40,7 +47,10 @@ void spi_init(){
 		pabort("can't set max speed hz");
 }
 
-void transfer(uint8_t*tx,uint32_t tx_len,uint8_t*rx,uint32_t rx_len)
+/*
+* send a packet by spi and then receive a ack messaage from spi bus
+*/
+void spi_transfer(uint8_t*tx,uint32_t tx_len,uint8_t*rx,uint32_t rx_len)
 {
 	struct spi_ioc_transfer tr[2] = {
 		{
