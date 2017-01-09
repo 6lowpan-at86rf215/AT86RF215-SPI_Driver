@@ -12,7 +12,7 @@ sudo chmod 777 /usr/local/arm
 su # root mod
 mv LinaroDirectory /usr/local/arm #move the Linaro to /usr/local/arm
 cd /usr/local/arm
-ln -s gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf toolchain
+ln -s gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf  toolchain
 ```
 * Setup the c-compiler cache(optional)
 ```sh
@@ -30,4 +30,8 @@ ln -s $(which ccache) arm-linux-gnueabihf-c++
 # add fllow statements to /etc/profile
 export TOOLCHAIN_PATH=/usr/local/arm/toolchain
 export pATH=$PATH:$TOOLCHAIN_PATH/bin-ccache:$TOOLCHAIN_PATH/bin
+```
+* Before you compiler the linux kernel, you should install as:
+```sh
+sudo apt-get install gawk wget git diffstat unzip texinfo gcc-multilib build-essential chrpath socat libsdl1.2-dev xterm picocom ncurses-dev lzop
 ```
