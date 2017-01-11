@@ -33,7 +33,7 @@ struct gpio_t at86rf215_gpio_irq={
 };
 
 struct gpio_t at86rf215_gpio_rest={
-	.name="/gpio/pin25",
+	.name="/gpio/pin24",
 	.fd=-1,
 	.direction=out,
 	.edge=none
@@ -58,6 +58,9 @@ int main(int argc, char *argv[]){
 		return -1;
 	}
 	if(-1==gpio_init(at86rf215_dev.gpio_irq)){
+		return -1;
+	}
+	if(-1==gpio_init(at86rf215_dev.gpio_rest)){
 		return -1;
 	}
 	struct spi_data_t message={

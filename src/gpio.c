@@ -24,13 +24,13 @@ const char* gpio_direction_name[]={"in","out"};
 int gpio_init(struct gpio_t* gpio){
 	char temp_buf[50];
 	sprintf(temp_buf,"echo %s > %s/direction",gpio_direction_name[gpio->direction],gpio->name);
-	printf("temp_buf = %s\n",temp_buf);
+	//printf("temp_buf = %s\n",temp_buf);
 	system(temp_buf); //set the gpio as input mode
 	sprintf(temp_buf,"echo %s > %s/edge",gpio_edge_name[gpio->edge],gpio->name);
-	printf("temp_buf = %s\n",temp_buf);
+	//printf("temp_buf = %s\n",temp_buf);
 	system(temp_buf); // set the gpio interrupt mode
 	sprintf(temp_buf,"%s/value",gpio->name);
-	printf("temp_buf = %s\n",temp_buf);
+	//printf("temp_buf = %s\n",temp_buf);
 	gpio->fd=open(temp_buf,O_RDONLY); 
 	if(gpio->fd<0){
 		perror("can't open gpio device");
@@ -38,6 +38,7 @@ int gpio_init(struct gpio_t* gpio){
 	}
 	return 0;
 }
+
 /*
 int main()
 {

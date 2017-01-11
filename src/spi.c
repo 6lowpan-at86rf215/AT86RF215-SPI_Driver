@@ -24,7 +24,6 @@
 #include "spi.h"
 #include "at86rf215_conf.h"
 
-//extern struct At86rf215_Dev_t at86rf215_dev;
 static inline uint16_t set_spi_address(uint16_t address){
 	uint16_t res=(address>>8)&0xff;
 	res|=(address&0xff)<<8;
