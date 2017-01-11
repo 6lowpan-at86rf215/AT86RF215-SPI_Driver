@@ -1,5 +1,7 @@
 #ifndef _SPI_H
 #define _SPI_H
+
+
 struct spi_t{
 	char *name;
 	uint8_t mode;
@@ -8,6 +10,15 @@ struct spi_t{
 	uint16_t delay;
 	int fd;
 };
-void spi_init(void);
-void spi_transfer(uint8_t*tx,uint32_t tx_len,uint8_t*rx,uint32_t rx_len);
+
+struct spi_data_t{
+	uint16_t address;
+	uint8_t* data;
+	uint32_t len;
+};
+
+int spi_init(void);
+int spi_write(struct spi_data_t* data);
+int spi_read(struct spi_data_t *data);
+
 #endif

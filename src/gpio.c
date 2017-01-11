@@ -6,13 +6,28 @@
 #include <sys/ioctl.h>
 #include <linux/types.h>
 #include <poll.h>
-static void pabort(const char *s)
-{
-	perror(s);
-	//if(at86rf215_dev.fd>0)
-	//	close(at86rf215_dev.fd);
-	abort();
+#include "gpio.h"
+#include "at86rf215_conf.h"
+
+extern struct At86rf215_Dev_t at86rf215_dev;
+
+const char* gpio_edge_name[]={"null","both","rising","falling"};
+
+int gpio_init(){
+	char temp_buf[50];
+	sprintf(temp_buf,"echo in > %s/direction",at86rf215_dev.at86rf215_gpio.name);
+	system(temp_buf); //set the gpio as input mode
+	sprintf(temp_buf,"echo %s > %s/direction",gpio_edge_name[at86rf215_dev.at86rf215_gpio.edge],at86rf215_dev.at86rf215_gpio.name);
+	system(temp_buf); // set the gpio interrupt mode
+	sprintf(temp_buf,"%s/value",at86rf215_dev.at86rf215_gpio.name);
+	at86rf215_dev.at86rf215_gpio.fd=open(temp_buf,O_RDONLY); 
+	if(at86rf215_dev.at86rf215_gpio.fd<0){
+		perror("can't open gpio device");
+		return -1;
+	}
+	return 0;
 }
+/*
 int main()
 {
 	system("echo in > /gpio/pin25/direction"); 
@@ -46,4 +61,4 @@ int main()
 	}  
 	close( gpio_fd );
 	return 0;
-}
+}*/
