@@ -1,3 +1,11 @@
+/*
+ * AT86RF215 test code with spi driver
+ *
+ * Copyright (c) 2017  Cisco, Inc.
+ * Copyright (c) 2017  <binyao@cisco.com>
+ *
+ */
+
 #include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -6,13 +14,31 @@
 #include <sys/ioctl.h>
 #include <linux/types.h>
 #include <poll.h>
-static void pabort(const char *s)
-{
-	perror(s);
-	//if(at86rf215_dev.fd>0)
-	//	close(at86rf215_dev.fd);
-	abort();
+#include "gpio.h"
+#include "at86rf215_conf.h"
+
+
+const char* gpio_edge_name[]={"none","both","rising","falling"};
+const char* gpio_direction_name[]={"in","out"};
+
+int gpio_init(struct gpio_t* gpio){
+	char temp_buf[50];
+	sprintf(temp_buf,"echo %s > %s/direction",gpio_direction_name[gpio->direction],gpio->name);
+	printf("temp_buf = %s\n",temp_buf);
+	system(temp_buf); //set the gpio as input mode
+	sprintf(temp_buf,"echo %s > %s/edge",gpio_edge_name[gpio->edge],gpio->name);
+	printf("temp_buf = %s\n",temp_buf);
+	system(temp_buf); // set the gpio interrupt mode
+	sprintf(temp_buf,"%s/value",gpio->name);
+	printf("temp_buf = %s\n",temp_buf);
+	gpio->fd=open(temp_buf,O_RDONLY); 
+	if(gpio->fd<0){
+		perror("can't open gpio device");
+		return -1;
+	}
+	return 0;
 }
+/*
 int main()
 {
 	system("echo in > /gpio/pin25/direction"); 
@@ -46,4 +72,4 @@ int main()
 	}  
 	close( gpio_fd );
 	return 0;
-}
+}*/

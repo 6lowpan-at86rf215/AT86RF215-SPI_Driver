@@ -1,8 +1,8 @@
 /*
  * AT86RF215 test code with spi driver
  *
- * Copyright (c) 2016  Cisco, Inc.
- * Copyright (c) 2016  <binyao@cisco.com>
+ * Copyright (c) 2017  Cisco, Inc.
+ * Copyright (c) 2017  <binyao@cisco.com>
  *
  */
 #include <stdint.h>
@@ -13,27 +13,81 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/types.h>
-#include "spi.h"
+#include "at86rf215_conf.h"
+struct spi_t at86rf215_spi={
+	.name="/dev/spidev1.0",
+	.mode=0,
+	.bits=8,
+	.speed=25000000,
+	.delay=0,
+	.fd=-1
 
-extern struct spi_t at86rf215_dev;
-void clean(void);
+};
+
+struct gpio_t at86rf215_gpio_irq={
+	.name="/gpio/pin25",
+	.fd=-1,
+	.direction=in,
+	.edge=both
+
+};
+
+struct gpio_t at86rf215_gpio_rest={
+	.name="/gpio/pin25",
+	.fd=-1,
+	.direction=out,
+	.edge=none
+
+};
+
+struct At86rf215_Dev_t at86rf215_dev={
+	.spi=&at86rf215_spi,
+	.gpio_irq=&at86rf215_gpio_irq,
+	.gpio_rest=&at86rf215_gpio_rest
+};
+
+static void clean(void);
 
 int main(int argc, char *argv[]){
-	int i;
-	uint8_t tx[]={0x00,0x0D};
-	uint8_t rx[2];
+	int i,ret;
+	uint16_t address=0x0005;
+	uint8_t cmd=0x03;
+	uint8_t rx[1];
 	atexit(clean);
-	spi_init();
-	spi_transfer(tx,2,rx,2);
-	printf("send address: %.2X %.2X \n",tx[0],tx[1]);
+	if(-1==spi_init(at86rf215_dev.spi)){
+		return -1;
+	}
+	if(-1==gpio_init(at86rf215_dev.gpio_irq)){
+		return -1;
+	}
+	struct spi_data_t message={
+		.address=address,
+		.data=rx,
+		.len=sizeof(rx)/sizeof(uint8_t)
+	};
+	ret=spi_read(at86rf215_dev.spi,&message);
+	printf("send address: %.4X\n",message.address);
 	printf("recv mesage:\n");
-	for(i=0;i<2;i++)
-		printf("%.2X ", rx[i]);
+	for(i=0;i<message.len;i++)
+		printf("%.2X ", message.data[i]);
 	printf("\n");
+	message.data=&cmd;
+	message.len=sizeof(cmd)/sizeof(uint8_t);
+	ret=spi_write(at86rf215_dev.spi,&message);
+	message.data=rx;
+	message.len=sizeof(rx)/sizeof(uint8_t);
+	ret=spi_read(at86rf215_dev.spi,&message);
+	printf("send address: %.4X\n",message.address);
+	printf("recv mesage:\n");
+	for(i=0;i<message.len;i++)
+		printf("%.2X ", message.data[i]);
+	printf("\n");
+
 	
 }
 
-void clean(void){
-	close(at86rf215_dev.fd);
+static void clean(void){
+	close(at86rf215_dev.spi->fd);
+	close(at86rf215_dev.gpio_irq->fd);
 }
 
