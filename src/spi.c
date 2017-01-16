@@ -1,15 +1,6 @@
 /*
  * AT86RF215 test code with spi driver
  *
- * Copyright (c) 2016  Cisco, Inc.
- * Copyright (c) 2016  <binyao@cisco.com>
- *
- */
-#include <stdint.h>
-#include <unistd.h>
-/*
- * AT86RF215 test code with spi driver
- *
  * Copyright (c) 2017  Cisco, Inc.
  * Copyright (c) 2017  <binyao@cisco.com>
  *
@@ -109,4 +100,49 @@ int spi_read(struct spi_t* spi,struct spi_data_t *data){
 	return data->len;
 
 }
+
+uint8_t spi_reg_read(struct spi_t* spi,uint16_t address){
+	uint8_t rx[1];
+	struct spi_data_t message={
+		.address=address,
+		.data=rx,
+		.len=sizeof(rx)/sizeof(uint8_t)
+	};
+	if(-1==spi_read(spi,&message)){
+		return -1;
+	}
+	return message.data[0];
+}
+
+int spi_reg_write(struct spi_t* spi,uint16_t address,uint8_t value){
+	uint8_t rx[1];
+	struct spi_data_t message={
+		.address=address,
+		.data=&value,
+		.len=sizeof(value)/sizeof(uint8_t)
+	};
+	int ret=spi_write(spi,&message);
+	if(-1==ret){
+		return -1;
+	}
+	return ret;
+}
+
+uint8_t spi_reg_bit_read(struct spi_t* spi,uint16_t address,uint8_t mask,uint8_t pos){
+	uint8_t ret=spi_reg_read(spi,address);
+	ret&=mask;
+	ret>>pos;
+	return ret;
+}
+
+uint8_t spi_reg_bit_write(struct spi_t* spi,uint16_t address,uint8_t mask,uint8_t pos,uint8_t new_value){
+	uint8_t current_reg_value=spi_reg_read(spi,address);
+	current_reg_value&=~(mask);
+	new_value<<=pos;
+	new_value&=mask;
+	new_value|=current_reg_value;
+	return spi_reg_write(spi,address,new_value);
+}
+
+
 

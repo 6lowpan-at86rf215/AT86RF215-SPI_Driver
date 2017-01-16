@@ -28,16 +28,16 @@ struct gpio_t at86rf215_gpio_irq={
 	.name="/gpio/pin25",
 	.fd=-1,
 	.direction=in,
-	.edge=both
-
+	.edge=both,
+	.value=low
 };
 
 struct gpio_t at86rf215_gpio_rest={
 	.name="/gpio/pin24",
 	.fd=-1,
 	.direction=out,
-	.edge=none
-
+	.edge=none,
+	.value=low
 };
 
 struct At86rf215_Dev_t at86rf215_dev={
@@ -63,25 +63,50 @@ int main(int argc, char *argv[]){
 	if(-1==gpio_init(at86rf215_dev.gpio_rest)){
 		return -1;
 	}
+	/*
+	set_gpio_value(at86rf215_dev.gpio_rest,low);
+	printf("read value=%d\n",get_gpio_value(at86rf215_dev.gpio_rest));
+	set_gpio_value(at86rf215_dev.gpio_rest,high);
+	printf("read value=%d\n",get_gpio_value(at86rf215_dev.gpio_rest));
+	*/
 	struct spi_data_t message={
 		.address=address,
 		.data=rx,
 		.len=sizeof(rx)/sizeof(uint8_t)
 	};
-	ret=spi_read(at86rf215_dev.spi,&message);
-	printf("send address: %.4X\n",message.address);
-	printf("recv mesage:\n");
-	for(i=0;i<message.len;i++)
-		printf("%.2X ", message.data[i]);
-	printf("\n");
-	message.data=&cmd;
-	message.len=sizeof(cmd)/sizeof(uint8_t);
-	ret=spi_write(at86rf215_dev.spi,&message);
+
 	message.data=rx;
 	message.len=sizeof(rx)/sizeof(uint8_t);
 	ret=spi_read(at86rf215_dev.spi,&message);
 	printf("send address: %.4X\n",message.address);
-	printf("recv mesage:\n");
+	printf("recv mesage:");
+	for(i=0;i<message.len;i++)
+		printf("%.2X ", message.data[i]);
+	printf("\n");
+
+	printf("write 0x03\n");
+	message.data=&cmd;
+	message.len=sizeof(cmd)/sizeof(uint8_t);
+	ret=spi_write(at86rf215_dev.spi,&message);
+
+	
+	message.data=rx;
+	message.len=sizeof(rx)/sizeof(uint8_t);
+	ret=spi_read(at86rf215_dev.spi,&message);
+	printf("send address: %.4X\n",message.address);
+	printf("recv mesage:");
+	for(i=0;i<message.len;i++)
+		printf("%.2X ", message.data[i]);
+	printf("\n");
+
+	printf("reset at86rf215\n");
+	printf("status=%d\n",tal_init(&at86rf215_dev));
+	
+	message.data=rx;
+	message.len=sizeof(rx)/sizeof(uint8_t);
+	ret=spi_read(at86rf215_dev.spi,&message);
+	printf("send address: %.4X\n",message.address);
+	printf("recv mesage:");
 	for(i=0;i<message.len;i++)
 		printf("%.2X ", message.data[i]);
 	printf("\n");

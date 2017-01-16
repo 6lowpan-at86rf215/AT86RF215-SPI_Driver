@@ -24,13 +24,10 @@ const char* gpio_direction_name[]={"in","out"};
 int gpio_init(struct gpio_t* gpio){
 	char temp_buf[50];
 	sprintf(temp_buf,"echo %s > %s/direction",gpio_direction_name[gpio->direction],gpio->name);
-	//printf("temp_buf = %s\n",temp_buf);
 	system(temp_buf); //set the gpio as input mode
 	sprintf(temp_buf,"echo %s > %s/edge",gpio_edge_name[gpio->edge],gpio->name);
-	//printf("temp_buf = %s\n",temp_buf);
 	system(temp_buf); // set the gpio interrupt mode
 	sprintf(temp_buf,"%s/value",gpio->name);
-	//printf("temp_buf = %s\n",temp_buf);
 	gpio->fd=open(temp_buf,O_RDONLY); 
 	if(gpio->fd<0){
 		perror("can't open gpio device");
@@ -38,6 +35,41 @@ int gpio_init(struct gpio_t* gpio){
 	}
 	return 0;
 }
+
+int set_gpio_value(struct gpio_t* gpio,enum gpio_value io_value){
+	if(gpio->direction=out){
+		char temp_buf[50];
+		//printf("set gpio %d \n",io_value);
+		sprintf(temp_buf,"echo %d > %s/value",io_value,gpio->name);
+		system(temp_buf);
+		gpio->value=io_value;
+		return 0;
+	}
+	else
+		return -1;
+}
+
+enum gpio_value get_gpio_value(struct gpio_t* gpio){
+	uint8_t value;
+	if(gpio->direction==in){
+		int ret = lseek(gpio->fd,0,SEEK_SET); 
+		if( ret == -1 ){
+			perror("can not uselseek");
+			return -1;
+		}
+		ret = read(gpio->fd,&value,1); 
+		if(ret==-1){
+			perror("can not write");
+			return -1;
+		}
+		value-='0';
+	}
+	else
+		value=gpio->value;
+	gpio->value=value;
+	return gpio->value;
+}
+
 
 /*
 int main()
