@@ -3,7 +3,7 @@
 * Test in [udoo-neo board](http://www.udoo.org/docs-neo/Introduction/Introduction.html)
 
 ***
-
+[gpio ref](https://developer.ridgerun.com/wiki/index.php/How_to_use_GPIO_signals)
 ## How to build a cross-compiling develop enviroment
 [reference](http://odroid.us/mediawiki/index.php?title=Step-by-step_Cross-compiling_a_Kernel)
 * Download the newest [Linaro](http://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/)
