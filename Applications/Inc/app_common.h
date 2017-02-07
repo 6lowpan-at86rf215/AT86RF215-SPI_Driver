@@ -59,9 +59,9 @@ typedef enum app_state_tag
 
 /* Default PIB value */
 #define OWN_PAN_ID              0xBABE
-#define OWN_SHORT_ADDR          0x1234
+#define OWN_SHORT_ADDR          0x1235
 #define PEER_PAN_ID             OWN_PAN_ID
-#define PEER_SHORT_ADDR         0x1235
+#define PEER_SHORT_ADDR         0x1234
 #define DEST_ADDR_MODE          FCF_SHORT_ADDR // FCF_LONG_ADDR
 #define SRC_ADDR_MODE           FCF_SHORT_ADDR // FCF_LONG_ADDR
 #define PEER_IEEE_ADDR          0x0807060504030201
@@ -129,7 +129,7 @@ char *get_pal_type_text(uint8_t pal_type);
  */
 void print_chat_menu(void);
 void chat_handle_incoming_frame(trx_id_t trx_id, frame_info_t *rx_frame);
-void get_chat_input(char input);
+void get_chat_input(char* input);
 void chat_tx_done_cb(trx_id_t trx_id, retval_t status, frame_info_t *frame);
 void init_tx_frame(void);
 

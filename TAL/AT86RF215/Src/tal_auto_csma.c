@@ -61,7 +61,7 @@ void csma_start(trx_id_t trx_id)
     /* Initialize CSMA variables */
     NB[trx_id] = 0;
     BE[trx_id] = tal_pib[trx_id].MinBE;
-printf("csma_start run\n");
+
     if (BE[trx_id] == 0)
     {
         /* Collision avoidance is disabled during first iteration */

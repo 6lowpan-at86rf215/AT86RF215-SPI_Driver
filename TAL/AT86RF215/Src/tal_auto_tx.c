@@ -85,7 +85,7 @@ retval_t tal_tx_frame(trx_id_t trx_id,
                       bool perform_frame_retry)
 {
     ASSERT((trx_id >= 0) && (trx_id < NUM_TRX));
-printf("tal_tx_frame run \n");
+
     if (tal_state[trx_id] == TAL_SLEEP)
     {
         return TAL_TRX_ASLEEP;
@@ -137,7 +137,7 @@ printf("tal_tx_frame run \n");
     /* Check if ACK is requested. */
     if (*mac_frame_ptr[trx_id]->mpdu & FCF_ACK_REQUEST)
     {
-printf("ACK is requested\n");
+
         ack_requested[trx_id] = true;
     }
     else

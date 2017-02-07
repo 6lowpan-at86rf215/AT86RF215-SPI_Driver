@@ -2,7 +2,7 @@
 # Makefile for Chat
 # $Id: Makefile 37628 2015-07-14 14:36:46Z uwalter $
 ############################################################################################
-TARGET=at86rf215-dev-1234_1235
+TARGET=at86rf215-dev-1235_1234
 # Build specific properties
 _TAL_TYPE = AT86RF215
 _HIGHEST_STACK_LAYER = TAL
@@ -38,6 +38,8 @@ CFLAGS += -DHIGHEST_STACK_LAYER=$(_HIGHEST_STACK_LAYER)
 CFLAGS += -DSHORTENUM=$(_SHORTENUM)
 CFLAGS += -DPAL_GENERIC_TYPE=$(_PAL_GENERIC_TYPE)
 CFLAGS += -DPAL_TYPE=$(_PAL_TYPE)
+#open the gdb debug mode
+CFLAGS += -g
 
 ## Include directories for application
 INCLUDES += -I $(PATH_APP)/Inc

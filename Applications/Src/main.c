@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/types.h>
+#include <string.h>
 #include <poll.h>
 #include "spi.h"
 #include "pal.h"
@@ -76,7 +77,7 @@ trx_id_t current_trx_id = (trx_id_t)0;
 static void clean(void);
 /* === PROTOTYPES ========================================================== */
 
-static void app_task(int);
+static void app_task(char*);
 static void app_init(void);
 
 #ifdef MULTI_TRX_SUPPORT
@@ -92,6 +93,7 @@ int main(int argc, char *argv[]){
 	struct pollfd fdset[2];
 	char buf[MAX_BUF];
 	int ret;
+	int len;
 	atexit(clean);
 	/* Initialize the TAL layer */	
     if (tal_init() != MAC_SUCCESS){
@@ -116,20 +118,16 @@ int main(int argc, char *argv[]){
 			break;
 		}
 		if (fdset[1].revents & POLLPRI) {
-			//lseek(fdset[1].fd, 0, SEEK_SET);
-			//len = read(fdset[1].fd, buf, MAX_BUF);
-			//printf("\npoll() GPIO %d interrupt occurred\n", gpio);
 			trx_irq_handler_cb();
 			tal_task();
 		}
 
 		if (fdset[0].revents & POLLIN) {
-			(void)read(fdset[0].fd, buf, 1);
-			//printf("\npoll() stdin read 0x%2.2X\n", (unsigned int) buf[0]);
-			app_task(buf[0]);
+			len=read(fdset[0].fd, buf, MAX_BUF);
+			buf[len-1]='\0';
+			app_task(buf);
 		}
 		fflush(stdout);
-
 	}
 }
 
@@ -170,11 +168,27 @@ static void app_init(void)
 /**
  * @brief Application task
  */
-static void app_task(int input)
+static void app_task(char* input)
 {
-    if (input != -1)
+	if(strcmp(input,"/quit")==0){
+		exit(0);
+	}
+	else if(strcmp(input,"/")==0){
+		handle_menu();
+	}
+	else if(strcmp(input,"/1G")==0){
+		switch_tx_band(RF09);
+	}
+	else if(strcmp(input,"/2.4G")==0){
+		switch_tx_band(RF24);
+	}
+	else{
+		get_chat_input(input);
+	}
+/*
+    if (*input != -1)
     {
-        switch (input)
+        switch (*input)
         {
 #ifdef MULTI_TRX_SUPPORT
             case SUB1_CHAR:
@@ -197,20 +211,8 @@ static void app_task(int input)
                 break;
         }
     }
-#ifdef MULTI_TRX_SUPPORT
-#   ifdef BUTTON_0
-    if (pal_button_read(BUTTON_0) == BUTTON_PRESSED)
-    {
-        switch_tx_band(RF09);
-    }
-#   endif
-#   ifdef BUTTON_1
-    if (pal_button_read(BUTTON_1) == BUTTON_PRESSED)
-    {
-        switch_tx_band(RF24);
-    }
-#   endif
 #endif
+*/
 }
 
 #ifdef MULTI_TRX_SUPPORT
@@ -270,7 +272,8 @@ static void handle_menu(void)
 
     /* Wait for input */
     //char input = sio_getchar();
-	char input = '0';
+	char input;
+	scanf("%c",&input);
     if (input == '0')
     {
         if (tal_trx_sleep(current_trx_id, SLEEP_MODE_1) == MAC_SUCCESS)

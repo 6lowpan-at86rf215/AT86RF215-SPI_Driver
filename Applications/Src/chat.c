@@ -87,7 +87,7 @@ void print_chat_menu(void)
         printf("%s\n", get_mod_text(current_mod[current_trx_id]));
     }
 
-    printf("Press 'CTRL-s' for sub-1GHz or 'CTRL-d' for 2.4GHz.\n");
+    printf("Press '/1G' for sub-1GHz or '/2.4G' for 2.4GHz.\n");
     printf("Press '/' to enter configuration menu.\n");
 #endif
 
@@ -272,7 +272,7 @@ void chat_handle_incoming_frame(trx_id_t trx_id, frame_info_t *rx_frame)
  *
  * @param input Input character
  */
-void get_chat_input(char input)
+void get_chat_input(char* input)
 {
     if (app_state[current_trx_id] == APP_IDLE)
     {
@@ -284,6 +284,23 @@ void get_chat_input(char input)
 			fflush(stdout);
 			return;
 		}
+		while(*input!='\0'){
+			*chat_pay_ptr++ = *input++;
+			input_len++;
+		}
+		if(input_len>0&&input_len<MAX_INPUT_LENGTH){
+			app_state[current_trx_id] = APP_TX;
+#ifdef MAC_2014
+			tx_frame->len_no_crc = input_len + tx_hdr_len;
+#else
+			tx_frame->mpdu[0] = input_len + tx_hdr_len + 1;
+#endif
+			tx_frame->mpdu[PL_POS_SEQ_NUM]++;
+			tal_tx_frame(current_trx_id, tx_frame, CSMA_MODE, RETRANSMISSION_ENABLED);
+			input_len = 0;
+		}
+
+/*
 		if(input == '\b')
 		{
 			input_len--;
@@ -292,6 +309,7 @@ void get_chat_input(char input)
 		}	
         *chat_pay_ptr++ = input;	
         input_len++;
+
         if ((input == NL) || (input == CR) || (input_len == MAX_INPUT_LENGTH))
         {
             app_state[current_trx_id] = APP_TX;
@@ -305,6 +323,8 @@ void get_chat_input(char input)
             tal_tx_frame(current_trx_id, tx_frame, CSMA_MODE, RETRANSMISSION_ENABLED);
             input_len = 0;
         }
+*/
+
     }
 }
 
